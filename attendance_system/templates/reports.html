@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-graph-up"></i> Attendance Reports</h2>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Student Attendance Summary</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Total Days</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Late</th>
+                        <th>Percentage</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>{{ report.roll_number }}</td>
+                        <td>{{ report.name }}</td>
+                        <td>{{ report.class }}</td>
+                        <td>{{ report.section }}</td>
+                        <td>{{ report.total_days }}</td>
+                        <td>{{ report.present }}</td>
+                        <td>{{ report.absent }}</td>
+                        <td>{{ report.late }}</td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar {% if report.percentage >= 75 %}bg-success{% elif report.percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                     role="progressbar" 
+                                     style="width: {{ report.percentage }}%">
+                                    {{ "%.1f"|format(report.percentage) }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if report.percentage >= 75 %}
+                            <span class="badge bg-success">Good</span>
+                            {% elif report.percentage >= 60 %}
+                            <span class="badge bg-warning">Average</span>
+                            {% else %}
+                            <span class="badge bg-danger">Poor</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4">
+            <button class="btn btn-success" onclick="exportToCSV()">
+                <i class="bi bi-download"></i> Export to CSV
+            </button>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="bi bi-printer"></i> Print Report
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+<script>
+$(document).ready(function() {
+    $('#reportsTable').DataTable({
+        pageLength: 10,
+        order: [[8, 'desc']]
+    });
+});
+
+function exportToCSV() {
+    let csv = [];
+    let rows = document.querySelectorAll('#reportsTable tr');
+    
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll('td, th');
+        
+        for (let j = 0; j < cols.length; j++) {
+            let text = cols[j].innerText;
+            row.push('"' + text + '"');
+        }
+        csv.push(row.join(','));
+    }
+    
+    let csvFile = new Blob([csv.join('\n')], {type: 'text/csv'});
+    let downloadLink = document.createElement('a');
+    downloadLink.download = 'attendance_report.csv';
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.click();
+}
+</script>
+{% endblock %}

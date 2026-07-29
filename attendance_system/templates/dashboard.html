@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Student Attendance System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Students</h5>
+                <h2 class="display-4">{{ total_students }}</h2>
+                <i class="bi bi-people" style="font-size: 2rem; position: absolute; right: 20px; top: 20px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Present Today</h5>
+                <h2 class="display-4">{{ present_today }}</h2>
+                <i class="bi bi-check-circle" style="font-size: 2rem; position: absolute; right: 20px; top: 20px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-danger h-100">
+            <div class="card-body">
+                <h5 class="card-title">Absent Today</h5>
+                <h2 class="display-4">{{ absent_today }}</h2>
+                <i class="bi bi-x-circle" style="font-size: 2rem; position: absolute; right: 20px; top: 20px;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body">
+                <h5 class="card-title">Overall Attendance</h5>
+                <h2 class="display-4">{{ "%.1f"|format(overall_percentage) }}%</h2>
+                <i class="bi bi-graph-up" style="font-size: 2rem; position: absolute; right: 20px; top: 20px;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-quick-action"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('take_attendance') }}" class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i> Take Attendance
+                    </a>
+                    <a href="{{ url_for('students') }}" class="btn btn-success">
+                        <i class="bi bi-person-plus"></i> Add New Student
+                    </a>
+                    <a href="{{ url_for('reports') }}" class="btn btn-info">
+                        <i class="bi bi-file-text"></i> Generate Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> System Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Today's Date:</strong> {{ date.today().isoformat() if date else "N/A" }}</p>
+                <p><strong>Attendance Rate:</strong> {{ "%.1f"|format(overall_percentage) }}%</p>
+                <p><strong>System Status:</strong> <span class="badge bg-success">Active</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add current date to template context
+    const currentDate = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('.card-body p:first-child strong').forEach(el => {
+        if (el.textContent === "Today's Date:") {
+            el.parentElement.innerHTML = `<strong>Today's Date:</strong> ${currentDate}`;
+        }
+    });
+</script>
+{% endblock %}
